@@ -2,14 +2,19 @@ package constants
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 )
 
 var (
+	APP_NAME          string
+	WEB_DOMAIN        string
+	FROM_EMAIL        string
 	SUPABASE_URL      string
 	SUPABASE_ANON_KEY string
-	DATABASE_URL string
-	BREVO_API_KEY string
+	DATABASE_URL      string
+	MIGRATION_FOLDER 	string
+	BREVO_API_KEY     string
 	ENV               string
 )
 
@@ -40,9 +45,16 @@ func Init() error {
 	// Set constants from viper
 	SUPABASE_URL = viper.GetString("SUPABASE_URL")
 	SUPABASE_ANON_KEY = viper.GetString("SUPABASE_ANON_KEY")
-	DATABASE_URL = viper.GetString("DATABASE_URL")
+	DATABASE_URL = viper.GetString("GOOSE_DBSTRING")
+	MIGRATION_FOLDER = viper.GetString("GOOSE_MIGRATION_DIR")
+	WEB_DOMAIN = viper.GetString("WEB_DOMAIN")
 	BREVO_API_KEY = viper.GetString("BREVO_API_KEY")
+	FROM_EMAIL = viper.GetString("FROM_EMAIL")
+	APP_NAME = viper.GetString("APP_NAME")
+
+	if APP_NAME == "" {
+		APP_NAME = "KeyValue API"
+	}
 
 	return nil
 }
-

@@ -7,6 +7,7 @@ import (
 	"keyvalue-api/setup"
 
 	"github.com/gin-gonic/gin"
+	"github.com/supabase-community/gotrue-go/types"
 )
 
 func RequireAuth() gin.HandlerFunc {
@@ -31,3 +32,15 @@ func RequireAuth() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func RequireUser(
+	c *gin.Context,
+) *types.UserResponse {
+	user, _ := c.Get("user")
+	if (user == nil) {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return nil
+	}
+	return user.(*types.UserResponse)
+}
+

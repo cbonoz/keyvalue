@@ -1,28 +1,34 @@
 package main
 
 import (
+	"context"
 	"keyvalue-api/constants"
 	"keyvalue-api/email"
-	"keyvalue-api/models"
 	"keyvalue-api/routes"
+	"keyvalue-api/sqlc_generated"
 	"log"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func main() {
-	db, err := gorm.Open(postgres.Open(constants.DATABASE_URL), &gorm.Config{})
+
+	ctx := context.Background()
+
+	// init db pool
+	pool, err := pgxpool.New(ctx, constants.DATABASE_URL)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Auto migrate the schema
-	db.AutoMigrate(&models.KeyValue{}, &models.APIKey{})
+	// init db queries
+	queries := sqlc_generated.New(pool)
+
 	brevoClient := email.InitBrevo()
 
-	server := routes.NewServer(db, brevoClient)
+	server := routes.NewServer(queries, brevoClient)
 	r := gin.Default()
 	server.RegisterRoutes(r)
 	r.Run(":8080")
