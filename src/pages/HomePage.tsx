@@ -14,7 +14,7 @@ const HomePage = () => {
         ) : (
           <Link to="/auth/sign-in">Sign In</Link>
         )}
-        <Link to="/protected">Protected Page 🛡️</Link>
+        <Link to="/apps">Manage Apps</Link>
         <div id="divider"></div>
         <Link
           to="https://github.com/mmvergara/react-supabase-auth-template"

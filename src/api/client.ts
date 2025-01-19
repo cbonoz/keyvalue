@@ -24,6 +24,10 @@ class APIClient {
     this.session = session;
   }
 
+  setBaseUrl(url: string) {
+    this.baseUrl = url;
+  }
+
   private async fetch(endpoint: string, options: RequestInit = {}) {
     const headers = {
       'Content-Type': 'application/json',
@@ -80,3 +84,4 @@ class APIClient {
 }
 
 export const apiClient = new APIClient();
+apiClient.setBaseUrl(import.meta.env.VITE_SERVER_URL + '/api');

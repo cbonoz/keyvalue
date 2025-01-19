@@ -10,6 +10,7 @@ import (
 	"keyvalue-api/sqlc_generated"
 	"log"
 
+	"github.com/gin-contrib/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -41,11 +42,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer dbConn.Close()
 
 	brevoClient := email.InitBrevo()
 
 	server := routes.NewServer(queries, brevoClient)
 	r := gin.Default()
+
+	corsConfig := cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"}, // Update with your Vite server URL
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}
+	r.Use(cors.New(corsConfig))
 	server.RegisterRoutes(r)
-	r.Run(":8080")
+	log.Default().Println("Server started on port " + constants.SERVER_PORT)
+	r.Run(":" + constants.SERVER_PORT)
 }

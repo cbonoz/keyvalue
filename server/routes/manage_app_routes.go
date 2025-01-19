@@ -44,9 +44,6 @@ func (s *Server) createApp(c *gin.Context) {
 
 func (s *Server) listApps(c *gin.Context) {
 	user := middleware.GetUser(c)
-	if user == nil {
-		return
-	}
 
 	var createdBy pgtype.UUID
 	createdBy.Scan(user.ID.String())
@@ -57,7 +54,12 @@ func (s *Server) listApps(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, apps)
+	if len(apps) == 0 {
+		// return empty list
+		c.JSON(http.StatusOK, []sqlc_generated.App{})
+	} else {
+		c.JSON(http.StatusOK, apps)
+	}
 }
 
 func (s *Server) getApp(c *gin.Context) {
@@ -104,7 +106,7 @@ func (s *Server) deleteApp(c *gin.Context) {
 }
 
 // get app keys with obfuscated keys
-func  (s *Server) getAppKeys(c *gin.Context) {
+func (s *Server) getAppKeys(c *gin.Context) {
 	appId := util.Int32(c.Param("id"))
 
 	keys, err := s.queries.ListKeyValues(c, appId)

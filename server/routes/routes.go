@@ -40,6 +40,13 @@ func (s *Server) RequireValidKey() gin.HandlerFunc {
 
 func (s *Server) RegisterRoutes(r *gin.Engine) {
 	api := r.Group("/api")
+	// hello world
+	hello := api.Group("/hello")
+	{
+		hello.GET("", func(c *gin.Context) {
+			c.JSON(200, gin.H{"message": "Hello, world!"})
+		})
+	}
 
 	// Key-Value routes with API key authentication
 	kv := api.Group("/kv")

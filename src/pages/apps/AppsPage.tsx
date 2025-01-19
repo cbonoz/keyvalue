@@ -5,19 +5,29 @@ import { useSession } from '../../context/SessionContext';
 
 export default function AppsPage() {
   const [apps, setApps] = useState<App[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [newAppName, setNewAppName] = useState('');
   const { session } = useSession();
 
   useEffect(() => {
     if (session) {
       apiClient.setSession(session);
-      loadApps();
     }
+      loadApps();
   }, [session]);
 
   const loadApps = async () => {
+    if (loading ||!session) {return;}
+    try {
+      setLoading(true);
     const apps = await apiClient.listApps();
     setApps(apps);
+    } catch (error) {
+      console.error('Error loading apps:', error);
+      alert('Failed to load apps. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreateApp = async (e: React.FormEvent) => {
@@ -37,7 +47,7 @@ export default function AppsPage() {
   };
 
   return (
-    <div className="container mx-auto p-4"></div>
+    <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Your Apps</h1>
 
       <form onSubmit={handleCreateApp} className="mb-6">
