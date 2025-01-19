@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"keyvalue-api/setup"
+	"keyvalue-api/sqlc_generated"
 
 	"github.com/gin-gonic/gin"
 	"github.com/supabase-community/gotrue-go/types"
@@ -33,14 +34,22 @@ func RequireAuth() gin.HandlerFunc {
 	}
 }
 
-func RequireUser(
+func GetUser(
 	c *gin.Context,
 ) *types.UserResponse {
 	user, _ := c.Get("user")
-	if (user == nil) {
+	if user == nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return nil
 	}
 	return user.(*types.UserResponse)
 }
 
+func GetApiKey(c *gin.Context) *sqlc_generated.ApiKey {
+	apiKey, _ := c.Get("apiKey")
+	if apiKey == nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return nil
+	}
+	return apiKey.(*sqlc_generated.ApiKey)
+}

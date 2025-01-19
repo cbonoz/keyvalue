@@ -16,7 +16,7 @@ type App struct {
 }
 
 type KeyValue struct {
-	AppID     string `json:"app_id"`
+	AppID     int32 `json:"app_id"`
 	Key       string `json:"key"`
 	Value     string `json:"value"`
 	CreatedAt time.Time
@@ -25,8 +25,8 @@ type KeyValue struct {
 }
 
 type APIKey struct {
-	ID        uint       `json:"id"`
-	AppID     string     `json:"app_id"`
+	ID        int32       `json:"id"`
+	AppID     int32     `json:"app_id"`
 	Key       string     `json:"key"`
 	CreatedAt time.Time  `json:"created_at"`
 	LastUsed  *time.Time `json:"last_used,omitempty"`

@@ -7,3 +7,6 @@ contracts/deploy.ts
 .env*
 # Sentry Config File
 .sentryclirc
+
+# build
+keyvalue-api

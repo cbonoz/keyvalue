@@ -3,11 +3,11 @@ INSERT INTO apps (created_by_user_id, name, created_at, updated_at)
 VALUES ($1, $2, NOW(), NOW())
 RETURNING *;
 
--- name: GetApp :one
-SELECT * FROM apps WHERE id = $1;
-
 -- name: ListUserApps :many
 SELECT * FROM apps WHERE created_by_user_id = $1;
+
+-- name: DeleteApp :exec
+DELETE FROM apps WHERE id = $1 and created_by_user_id = $2;
 
 -- name: CreateAPIKey :one
 INSERT INTO api_keys (app_id, key)
@@ -34,6 +34,12 @@ SELECT * FROM key_values WHERE app_id = $1 AND key = $2;
 -- name: ListKeyValues :many
 SELECT * FROM key_values WHERE app_id = $1;
 
--- name: DeleteKeyValue :exec
-DELETE FROM key_values WHERE app_id = $1 AND key = $2;
+-- name: DeleteKeyValues :exec
+DELETE FROM key_values WHERE app_id = $1 AND key in ($2::text[]);
+
+-- name: ValidateAppOwnership :one
+SELECT EXISTS (
+    SELECT 1 FROM apps
+    WHERE id = $1 AND created_by_user_id = $2
+) as has_access;
 

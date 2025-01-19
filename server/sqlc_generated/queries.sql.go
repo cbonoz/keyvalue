@@ -61,17 +61,31 @@ func (q *Queries) CreateApp(ctx context.Context, arg CreateAppParams) (App, erro
 	return i, err
 }
 
-const deleteKeyValue = `-- name: DeleteKeyValue :exec
-DELETE FROM key_values WHERE app_id = $1 AND key = $2
+const deleteApp = `-- name: DeleteApp :exec
+DELETE FROM apps WHERE id = $1 and created_by_user_id = $2
 `
 
-type DeleteKeyValueParams struct {
-	AppID int32
-	Key   string
+type DeleteAppParams struct {
+	ID              int32
+	CreatedByUserID pgtype.UUID
 }
 
-func (q *Queries) DeleteKeyValue(ctx context.Context, arg DeleteKeyValueParams) error {
-	_, err := q.db.Exec(ctx, deleteKeyValue, arg.AppID, arg.Key)
+func (q *Queries) DeleteApp(ctx context.Context, arg DeleteAppParams) error {
+	_, err := q.db.Exec(ctx, deleteApp, arg.ID, arg.CreatedByUserID)
+	return err
+}
+
+const deleteKeyValues = `-- name: DeleteKeyValues :exec
+DELETE FROM key_values WHERE app_id = $1 AND key in ($2::text[])
+`
+
+type DeleteKeyValuesParams struct {
+	AppID   int32
+	Column2 []string
+}
+
+func (q *Queries) DeleteKeyValues(ctx context.Context, arg DeleteKeyValuesParams) error {
+	_, err := q.db.Exec(ctx, deleteKeyValues, arg.AppID, arg.Column2)
 	return err
 }
 
@@ -232,4 +246,23 @@ func (q *Queries) UpsertKeyValue(ctx context.Context, arg UpsertKeyValueParams) 
 		&i.DeletedAt,
 	)
 	return i, err
+}
+
+const validateAppOwnership = `-- name: ValidateAppOwnership :one
+SELECT EXISTS (
+    SELECT 1 FROM apps
+    WHERE id = $1 AND created_by_user_id = $2
+) as has_access
+`
+
+type ValidateAppOwnershipParams struct {
+	ID              int32
+	CreatedByUserID pgtype.UUID
+}
+
+func (q *Queries) ValidateAppOwnership(ctx context.Context, arg ValidateAppOwnershipParams) (bool, error) {
+	row := q.db.QueryRow(ctx, validateAppOwnership, arg.ID, arg.CreatedByUserID)
+	var has_access bool
+	err := row.Scan(&has_access)
+	return has_access, err
 }
