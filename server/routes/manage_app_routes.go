@@ -107,7 +107,7 @@ func (s *Server) deleteApp(c *gin.Context) {
 func  (s *Server) getAppKeys(c *gin.Context) {
 	appId := util.Int32(c.Param("id"))
 
-	keys, err := s.queries.GetApp(c, appId)
+	keys, err := s.queries.ListKeyValues(c, appId)
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "app not found"})
 		return

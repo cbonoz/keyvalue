@@ -61,20 +61,3 @@ func (s *Server) createAPIKey(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, key)
 }
-
-func (s *Server) getAPIKey(c *gin.Context) {
-	keyStr := c.Param("key")
-	key, err := s.queries.GetAPIKey(c, keyStr)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "key not found"})
-		return
-	}
-
-	// Update last used timestamp
-	if err := s.queries.UpdateAPIKeyLastUsed(c, key.ID); err != nil {
-		// Log error but don't fail the request
-		c.Error(err)
-	}
-
-	c.JSON(http.StatusOK, key)
-}
