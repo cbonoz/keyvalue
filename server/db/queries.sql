@@ -15,7 +15,6 @@ VALUES ($1, $2)
 RETURNING *;
 
 -- name: GetAPIKey :one
-
 SELECT * FROM api_keys WHERE key = $1 AND is_active = true;
 
 -- name: UpdateAPIKeyLastUsed :exec

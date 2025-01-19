@@ -1,3 +1,5 @@
+-- +goose Up
+-- +goose StatementBegin
 CREATE TABLE apps (
     id SERIAL PRIMARY KEY,
     created_by_user_id UUID NOT NULL,
@@ -27,3 +29,14 @@ CREATE TABLE api_keys (
     deleted_at TIMESTAMP,
     FOREIGN KEY (app_id) REFERENCES apps(id)
 );
+
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+
+DROP TABLE api_keys;
+DROP TABLE key_values;
+DROP TABLE apps;
+
+-- +goose StatementEnd
